@@ -1,0 +1,105 @@
+@import './variables.scss';
+@mixin text-align {
+  @for $i from 1 to length($text-align-list) + 1 {
+    .text-#{nth($text-align-list,$i)} {
+      text-align: nth($text-align-list, $i) !important;
+    }
+
+    @for $j from 1 to length($text-align-list) + 1 {
+      .text-#{nth($media-queries-list,$i)}-#{nth($text-align-list,$i)} {
+        @include media-queries(#{nth($media-queries-list, $i)}) {
+          text-align: nth($text-align-list, $i) !important;
+        }
+      }
+    }
+  }
+}
+
+@mixin get_fractional_Spacing {
+  @each $type in $spacing-type {
+    // padding or margin css short hand
+    @for $i from 1 to 6 {
+      .#{nth($type, 1)}-#{$i} {
+        #{nth($type, 2)}: nth($spacing-size, $i) !important;
+      }
+
+      // media queries implementation
+      @for $j from 1 to 5 {
+        .#{nth($type, 1)}-#{nth($media-queries-list,$j)}-#{$i} {
+          @include media-queries(#{nth($media-queries-list, $j)}) {
+            #{nth($type, 2)}: nth($spacing-size, $i) !important;
+          }
+        }
+      }
+    }
+
+    // padding or margin css long hand
+    @each $dir in $directions {
+      @for $i from 1 to 7 {
+        @if (nth($dir, 1) == 'x') {
+          .#{nth($type, 1)}#{nth($dir,1)}-#{$i} {
+            @for $j from 1 to 3 {
+              #{nth($type,2)}-#{nth(nth($dir,2),$j)}: nth(
+                $spacing-size,
+                $i
+              ) !important;
+            }
+          }
+
+          // media queries implementation
+          @for $k from 1 to 5 {
+            .#{nth($type, 1)}#{nth($dir,1)}-#{nth($media-queries-list,$k)}-#{$i} {
+              @include media-queries(#{nth($media-queries-list, $k)}) {
+                @for $j from 1 to 3 {
+                  #{nth($type,2)}-#{nth(nth($dir,2),$j)}: nth(
+                    $spacing-size,
+                    $i
+                  ) !important;
+                }
+              }
+            }
+          }
+        } @else if (nth($dir, 1) == 'y') {
+          .#{nth($type, 1)}#{nth($dir,1)}-#{$i} {
+            @for $j from 1 to 3 {
+              #{nth($type,2)}-#{nth(nth($dir,2),$j)}: nth(
+                $spacing-size,
+                $i
+              ) !important;
+            }
+          }
+
+          // media queries implementation
+          @for $k from 1 to 5 {
+            .#{nth($type, 1)}#{nth($dir,1)}-#{nth($media-queries-list,$k)}-#{$i} {
+              @include media-queries(#{nth($media-queries-list, $k)}) {
+                @for $j from 1 to 3 {
+                  #{nth($type,2)}-#{nth(nth($dir,2),$j)}: nth(
+                    $spacing-size,
+                    $i
+                  ) !important;
+                }
+              }
+            }
+          }
+        } @else {
+          .#{nth($type, 1)}#{nth($dir,1)}-#{$i} {
+            #{nth($type,2)}-#{nth($dir,2)}: nth($spacing-size, $i) !important;
+          }
+
+          // media queries implementation
+          @for $k from 1 to 5 {
+            .#{nth($type, 1)}#{nth($dir,1)}-#{nth($media-queries-list,$k)}-#{$i} {
+              @include media-queries(#{nth($media-queries-list, $k)}) {
+                #{nth($type,2)}-#{nth($dir,2)}: nth(
+                  $spacing-size,
+                  $i
+                ) !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
