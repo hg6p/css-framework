@@ -1,4 +1,25 @@
 @import './variables.scss';
+
+@mixin media-queries($view-port) {
+  @if ($view-port == 'sm') {
+    @media screen and (min-width: 576px) {
+      @content;
+    }
+  } @else if($view-port == 'md') {
+    @media screen and (min-width: 768px) {
+      @content;
+    }
+  } @else if($view-port == 'lg') {
+    @media screen and (min-width: 992px) {
+      @content;
+    }
+  } @else if($view-port == 'xl') {
+    @media screen and (min-width: 1200px) {
+      @content;
+    }
+  }
+}
+
 @mixin text-align {
   @for $i from 1 to length($text-align-list) + 1 {
     .text-#{nth($text-align-list,$i)} {
@@ -15,15 +36,188 @@
   }
 }
 
+@mixin colors {
+  @each $color in $color-map {
+    .text-#{nth($color,1)} {
+      color: #{nth($color, 2)};
+    }
+    /* bg-color */
+    .bg-#{nth($color,1)} {
+      background-color: #{$color, 2};
+    }
+    .border-#{nth($color,1)} {
+      border-color: #{$color, 2};
+    }
+  }
+}
+
+@mixin display {
+  @for $i from 1 to length($displays-type) + 1 {
+    .d-#{nth($displays-type,$i)} {
+      display: nth($displays-type, $i) !important;
+    }
+    /* Media queries */
+    @for $j from 1 to length($media-queries-list) {
+      .d-#{nth($media-queries-list,$j)}-#{nth($displays-type,$i)} {
+        @include media-queries(#{nth($media-queries-list, $j)}) {
+          display: nth($displays-type, $i) !important;
+        }
+      }
+    }
+  }
+}
+
+@mixin flex-direction {
+  @for $i from 1 to lenght($flex-direction-list) + 1 {
+    .flex-#{nth($flex-direction-list,i)} {
+      flex-direction: nth($flex-direction-list, i) !important;
+    }
+    /* media-queries */
+    @for $j from 1 to length($media-queries-list) + 1 {
+      .flex-#{nth($media-queries-list,$j)}-#{nth($flex-direction-list,$i)} {
+        @include media-queries(#{nth($media-queries-list, $j)}) {
+          flex-direction: nth($flex-direction-list, $i) !important;
+        }
+      }
+    }
+  }
+}
+
+@mixin flex-wrap {
+  @for $i from 1 to length($flex-wrap-list) + 1 {
+    .flex-#{nth($flex-wrap-list,$i)} {
+      flex-wrap: nth($flex-wrap-list, $i) !important;
+    }
+    @for $j from 1 to length($media-queries-list) + 1 {
+      .flex-#{nth($media-queries-list,$j)}-#{nth($flex-wrap-list,$i)} {
+        @include media-queries(#{nth($media-queries-list, $j)}) {
+          flex-wrap: nth($flex-wrap-list, $i) !important;
+        }
+      }
+    }
+  }
+}
+
+@mixin justify-content {
+  @each $content in $flex-justify-map {
+    .justify-#{nth($content,1)} {
+      justify-content: nth($content, 2) !important;
+    }
+
+    @for $i from 1 to length($media-queries-list) + 1 {
+      .justify-#{nth($media-queries-list,$i)}-#{nth($content,2)} {
+        @include media-queries(#{nth($media-queries-list, $i)}) {
+          justify-content: nth($content, 2) !important;
+        }
+      }
+    }
+  }
+}
+
+@mixin flex-align {
+  @each $align in $flex-align-list {
+    @if ($align== 'align-content') {
+      @each $item in $flex-align-content-map {
+        .#{$align}-#{nth($item,
+        1)} {
+          #{$align}: #{nth($item, 2)} !important;
+        }
+        @for $i from 1 to length($media-queries-list) + 1 {
+          .#{$align}-#{nth($media-queries-list,$i)}-#{nth($item,1)} {
+            @include media-queries(#{nth($media-queries-list, $i)}) {
+              #{$align}: #{nth($item, 2)} !important;
+            }
+          }
+        }
+      }
+    } @else {
+      @each $item in $flex-align-map {
+        .#{$align}-#{nth($item,1)} {
+          #{$align}: #{nth($item, 2)} !important;
+        }
+        @for $i from 1 to length($media-queries-list) + 1 {
+          .#{$align}-#{nth($media-queries-list,$i)}-#{nth($item,1)} {
+            @include media-queries(#{nth($media-queries-list, $i)}) {
+              #{$align}: #{nth($item, 2)} !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@mixin grid-box-size($size) {
+  margin: $gutter-width/2;
+
+  @if ($size ==$grid-columns-count) {
+    max-width: ($column-width * $size)+ ($gutter-width * $size);
+    width: 100%;
+  } @else {
+    width: ($column-width * $size) + ($gutter-width * ($size - 1));
+  }
+}
+
+@mixin grid-column-settings {
+  @for $i from 1 to 13 {
+    .col-#{$i} {
+      @include grid-box-size($i);
+    }
+
+    @for $j from 1 to 5 {
+      #{nth($media-queries-breakpoint-specificity,$j)}.col-#{nth($media-queries-list,$j)}-#{$i} {
+        @include media-queries(#{nth($media-queries-list, $j)}) {
+          @include grid-box-size($i);
+        }
+      }
+    }
+  }
+}
+
+@mixin offset-column-settings {
+  .offset-0 {
+    margin-left: $gutter-width / 2;
+  }
+
+  @for $i from 1 to 13 {
+    .offset-#{$i} {
+      margin-left: ($column-width * $i) + ($gutter-width * ($i - 1));
+    }
+
+    @for $j from 1 to 5 {
+      .offset-#{nth($media-queries-list,$j)}-#{$i} {
+        @include media-queries(#{nth($media-queries-list, $j)}) {
+          margin-left: ($column-width * $i) + ($gutter-width * ($i - 1));
+        }
+      }
+    }
+  }
+}
+
+@mixin column-order {
+  @for $i from 1 to 13 {
+    .order-#{$i} {
+      order: #{$i};
+    }
+
+    @for $j from 1 to 5 {
+      .order-#{nth($media-queries-list,$j)}-#{$i} {
+        @include media-queries(#{nth($media-queries-list, $j)}) {
+          order: #{$i} !important;
+        }
+      }
+    }
+  }
+}
+
 @mixin get_fractional_Spacing {
   @each $type in $spacing-type {
-    // padding or margin css short hand
+    // padding or margin css
     @for $i from 1 to 6 {
       .#{nth($type, 1)}-#{$i} {
         #{nth($type, 2)}: nth($spacing-size, $i) !important;
       }
 
-      // media queries implementation
+      // media queries
       @for $j from 1 to 5 {
         .#{nth($type, 1)}-#{nth($media-queries-list,$j)}-#{$i} {
           @include media-queries(#{nth($media-queries-list, $j)}) {
@@ -33,7 +227,7 @@
       }
     }
 
-    // padding or margin css long hand
+    // padding or margin css
     @each $dir in $directions {
       @for $i from 1 to 7 {
         @if (nth($dir, 1) == 'x') {
@@ -46,7 +240,7 @@
             }
           }
 
-          // media queries implementation
+          // media queries
           @for $k from 1 to 5 {
             .#{nth($type, 1)}#{nth($dir,1)}-#{nth($media-queries-list,$k)}-#{$i} {
               @include media-queries(#{nth($media-queries-list, $k)}) {
@@ -69,7 +263,7 @@
             }
           }
 
-          // media queries implementation
+          // media queries
           @for $k from 1 to 5 {
             .#{nth($type, 1)}#{nth($dir,1)}-#{nth($media-queries-list,$k)}-#{$i} {
               @include media-queries(#{nth($media-queries-list, $k)}) {
@@ -87,7 +281,7 @@
             #{nth($type,2)}-#{nth($dir,2)}: nth($spacing-size, $i) !important;
           }
 
-          // media queries implementation
+          // media queries
           @for $k from 1 to 5 {
             .#{nth($type, 1)}#{nth($dir,1)}-#{nth($media-queries-list,$k)}-#{$i} {
               @include media-queries(#{nth($media-queries-list, $k)}) {
@@ -99,6 +293,58 @@
             }
           }
         }
+      }
+    }
+  }
+}
+@mixin borders {
+  .border {
+    border: solid 1px #dee2e6;
+  }
+  .border-0 {
+    border: none;
+  }
+  .rounded {
+    border-radius: 0.25rem;
+  }
+  .rounded-0 {
+    border-radius: 0;
+  }
+
+  .rounded-circle {
+    border-radius: 50%;
+  }
+
+  .rounded-pill {
+    border-radius: 50rem;
+  }
+
+  .rounded-sm {
+    border-radius: 0.2rem;
+  }
+
+  .rounded-lg {
+    border-radius: 0.3rem;
+  }
+  @each $direction in $directions {
+    $border-radius-single-side-map: (
+      top: top-left top-right,
+      right: top-right bottom-right,
+      bottom: bottom-left bottom-right,
+      left: top-left bottom-left,
+    );
+
+    @if (#{nth($direction, 1)} != 'x' and #{nth($direction, 1)} != 'y') {
+      .border-#{nth($direction,2)} {
+        border-#{nth($direction,2)}: solid 1px #dee2e6;
+      }
+      .border-#{nth($direction,2)}-0 {
+        border-#{nth($direction,2)}: none;
+      }
+
+      .rounded-#{nth($direction,2)} {
+        border-#{nth(map-get($border-radius-single-side-map,#{nth($direction,2)}),1)}-radius: 0.25rem;
+        border-#{nth(map-get($border-radius-single-side-map,#{nth($direction,2)}),2)}-radius: 0.25rem;
       }
     }
   }
